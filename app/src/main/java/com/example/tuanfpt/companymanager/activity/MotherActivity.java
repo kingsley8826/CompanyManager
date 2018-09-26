@@ -15,12 +15,10 @@ import com.example.tuanfpt.companymanager.R;
 import com.example.tuanfpt.companymanager.adapter.CompanyAdapter;
 import com.example.tuanfpt.companymanager.adapter.OnCompanyItemSelected;
 import com.example.tuanfpt.companymanager.models.Company;
-import com.example.tuanfpt.companymanager.models.Department;
 import com.example.tuanfpt.companymanager.network.RetrofitContext;
 import com.example.tuanfpt.companymanager.utilities.Constant;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -28,7 +26,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements OnCompanyItemSelected {
+public class MotherActivity extends AppCompatActivity implements OnCompanyItemSelected {
 
     @BindView(R.id.edtCompany)
     EditText edtCompany;
@@ -36,11 +34,13 @@ public class MainActivity extends AppCompatActivity implements OnCompanyItemSele
     RecyclerView rvCompanies;
 
     private CompanyAdapter companyAdapter;
+    protected boolean isChildrenActivity = false;
+    protected String motherName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_company);
         init();
         addListener();
     }
@@ -73,21 +73,35 @@ public class MainActivity extends AppCompatActivity implements OnCompanyItemSele
         });
     }
 
-    private void updateRecyclerView(ArrayList<Company> companies){
+    private void updateRecyclerView(ArrayList<Company> companies) {
         companyAdapter = new CompanyAdapter(companies, this);
         rvCompanies.setAdapter(companyAdapter);
     }
 
-    private void getAllCompany(){
+    private void getAllCompany() {
         RetrofitContext.getAllCompany().enqueue(new Callback<ArrayList<Company>>() {
             @Override
             public void onResponse(@NonNull Call<ArrayList<Company>> call, @NonNull Response<ArrayList<Company>> response) {
                 if (response.code() == 200) {
                     ArrayList<Company> companies = response.body();
-                    if(companies == null) return;
-                    updateRecyclerView(companies);
+                    if (companies == null) return;
+                    ArrayList<Company> motherCompany = new ArrayList<>();
+                    ArrayList<Company> childrenCompany = new ArrayList<>();
+                    for (Company company : companies) {
+                        if (company.getType().equals(Constant.COMPANY_MOTHER)) {
+                            motherCompany.add(company);
+                        } else {
+                            if (company.getMother().equals(motherName))
+                                childrenCompany.add(company);
+                        }
+                    }
+                    if (isChildrenActivity) {
+                        updateRecyclerView(childrenCompany);
+                    } else {
+                        updateRecyclerView(motherCompany);
+                    }
                 } else {
-                     showToast(getString(R.string.internet_error));
+                    showToast(getString(R.string.internet_error));
                 }
             }
 
@@ -98,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements OnCompanyItemSele
         });
     }
 
-    private void showToast(String message){
+    private void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
@@ -106,8 +120,14 @@ public class MainActivity extends AppCompatActivity implements OnCompanyItemSele
     public void onItemSelected(Company company) {
 
         edtCompany.setText("");
-        Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-        intent.putExtra(Constant.COMPANY_ID, company.getId());
+        Intent intent;
+        if (isChildrenActivity) {
+            intent = new Intent(MotherActivity.this, DetailActivity.class);
+            intent.putExtra(Constant.COMPANY_ID, company.getId());
+        } else {
+            intent = new Intent(MotherActivity.this, ChildrenActivity.class);
+            intent.putExtra(Constant.MOTHER_NAME, company.getName());
+        }
         startActivity(intent);
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }

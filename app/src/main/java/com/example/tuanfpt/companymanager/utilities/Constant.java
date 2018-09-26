@@ -6,4 +6,5 @@ public class Constant {
     public static final String DEPARTMENT = "department";
     public static final String COMPANY_MOTHER = "mother";
     public static final String COMPANY_ID = "company_id";
+    public static final String MOTHER_NAME = "mother_name";
 }

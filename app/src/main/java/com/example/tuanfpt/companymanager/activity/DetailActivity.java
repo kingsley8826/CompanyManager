@@ -1,7 +1,6 @@
 package com.example.tuanfpt.companymanager.activity;
 
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,7 +13,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.example.tuanfpt.companymanager.R;
 import com.google.firebase.storage.FirebaseStorage;
@@ -37,8 +35,8 @@ public class DetailActivity extends Activity implements View.OnClickListener {
 
     private static final int TAKE_PICTURE = 1;
 
-//    private StorageReference mStorageRef;
-//    private Uri imageUri;
+    private StorageReference mStorageRef;
+    private Uri imageUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +48,7 @@ public class DetailActivity extends Activity implements View.OnClickListener {
 
     private void init() {
         ButterKnife.bind(this);
-//        mStorageRef = FirebaseStorage.getInstance().getReference();
+        mStorageRef = FirebaseStorage.getInstance().getReference();
     }
 
     private void addListener() {
@@ -115,6 +113,7 @@ public class DetailActivity extends Activity implements View.OnClickListener {
                 break;
         }
     }
+
     private void setPicture() {
         // Get the dimensions of the View
         int targetW = imvPhoto.getWidth();

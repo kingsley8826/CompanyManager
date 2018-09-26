@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">CompanyManager</string>
+    <string name="phone">SĐT</string>
+    <string name="address">Địa chỉ</string>
+    <string name="search_hint">Tìm kiếm công ty</string>
+    <string name="internet_error">Lỗi đường truyền</string>
 </resources>

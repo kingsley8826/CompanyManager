@@ -1,8 +1,12 @@
 package com.example.tuanfpt.companymanager.network;
 
 import com.example.tuanfpt.companymanager.models.Account;
+import com.example.tuanfpt.companymanager.models.Company;
+import com.example.tuanfpt.companymanager.models.Department;
 import com.example.tuanfpt.companymanager.models.JSONDepartmentSendForm;
 import com.google.gson.Gson;
+
+import java.util.ArrayList;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -24,10 +28,18 @@ public class RetrofitContext {
         return RETROFIT.create(GetService.class).callLogin(requestBody);
     }
 
-    public static Call<String[]> getUsernameByDepartment(String departmentName) {
+    public static Call<ArrayList<Department>> getAllDepartment() {
+        return RETROFIT.create(GetService.class).getAllDepartment();
+    }
+
+    public static Call<ArrayList<String>> getUsernameByDepartment(String departmentName) {
         RequestBody requestBody = RequestBody.create(
                 MediaType.parse("application/json"),
                 (new Gson()).toJson(new JSONDepartmentSendForm(departmentName)));
         return RETROFIT.create(GetService.class).getUsernameByDepartment(requestBody);
+    }
+
+    public static Call<ArrayList<Company>> getAllCompany() {
+        return RETROFIT.create(GetService.class).getAllCompany();
     }
 }

@@ -4,4 +4,6 @@ public class Constant {
     public static final String COMPANY_KEY = "company_key";
     public static final String USERNAME = "user_name";
     public static final String DEPARTMENT = "department";
+    public static final String COMPANY_MOTHER = "mother";
+    public static final String COMPANY_ID = "company_id";
 }

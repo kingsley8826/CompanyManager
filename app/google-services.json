@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "366355444702",
+    "firebase_url": "https://companymanager-218a2.firebaseio.com",
+    "project_id": "companymanager-218a2",
+    "storage_bucket": "companymanager-218a2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:366355444702:android:50afd8c1eccbc232",
+        "android_client_info": {
+          "package_name": "com.example.tuanfpt.companymanager"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "366355444702-gl4t52rqfimhti6uqtgf7ghgao0l9ekq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.tuanfpt.companymanager",
+            "certificate_hash": "f902dc672f03e3542b5208b9ae61ba65bc289353"
+          }
+        },
+        {
+          "client_id": "366355444702-2iuif8tseiglghdih9ocne4c2b73e5lv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7Qrvgt7Eod7UO_YwdBBsXw8lA1L2OK2g"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "366355444702-2iuif8tseiglghdih9ocne4c2b73e5lv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,7 +1,6 @@
 package com.example.tuanfpt.companymanager.activity;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
@@ -10,17 +9,22 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.tuanfpt.companymanager.R;
 import com.example.tuanfpt.companymanager.adapter.SpinnerAdapter;
 import com.example.tuanfpt.companymanager.models.Account;
+import com.example.tuanfpt.companymanager.models.Department;
 import com.example.tuanfpt.companymanager.network.RetrofitContext;
 import com.example.tuanfpt.companymanager.utilities.Constant;
+
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -41,8 +45,8 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     @BindView(R.id.txt_error)
     TextView txtError;
 
-    String[] departmentItems = new String[]{"P.Điều Hành", "P.Bảo Dưỡng"};
-    String[] usernameItems = new String[]{"admin_dh1", "admin_dh2"};
+    ArrayList<String> departmentItems = new ArrayList<>();
+    ArrayList<String> usernameItems = new ArrayList<>();
 
     private SharedPreferences sharedPreferences;
 
@@ -68,7 +72,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         sharedPreferences = this.getSharedPreferences(Constant.COMPANY_KEY, MODE_PRIVATE);
         filterSpinner(departmentSpinner, departmentItems, Constant.DEPARTMENT);
         filterSpinner(usernameSpinner, usernameItems,Constant.USERNAME);
-        getUsernameByDepartment(departmentItems[0]);
+        getAllDepartment();
     }
 
     private void addListener() {
@@ -94,7 +98,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         });
     }
 
-    private void filterSpinner(Spinner spinner, String[] data, String type) {
+    private void filterSpinner(Spinner spinner, ArrayList<String> data, String type) {
         SpinnerAdapter spinnerAdapter = new SpinnerAdapter(this, R.layout.custom_spinner, data, type);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(spinnerAdapter);
@@ -102,26 +106,51 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        String department = departmentItems[position];
+        String department = departmentItems.get(position);
         getUsernameByDepartment(department);
     }
 
-    private void getUsernameByDepartment(final String department) {
+    private void getAllDepartment() {
 
-        RetrofitContext.getUsernameByDepartment(department).enqueue(new Callback<String[]>() {
+        RetrofitContext.getAllDepartment().enqueue(new Callback<ArrayList<Department>>() {
             @Override
-            public void onResponse(@NonNull Call<String[]> call, @NonNull Response<String[]> response) {
+            public void onResponse(@NonNull Call<ArrayList<Department>> call, @NonNull Response<ArrayList<Department>> response) {
                 if (response.code() == 200) {
-                    usernameItems = response.body();
-                    filterSpinner(usernameSpinner, usernameItems, Constant.USERNAME);
+                    ArrayList<Department> departments = response.body();
+                    if(departments == null) return;
+                    for(int i = 0 ; i < departments.size(); i++){
+                        departmentItems.add(departments.get(i).getName());
+                    }
+                    getUsernameByDepartment(departmentItems.get(0));
+                    filterSpinner(departmentSpinner, departmentItems, Constant.DEPARTMENT);
                 } else {
-                    getUsernameByDepartment(department);
+                    showToast("Lỗi đường truyền");
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<String[]> call, @NonNull Throwable t) {
-                getUsernameByDepartment(department);
+            public void onFailure(@NonNull Call<ArrayList<Department>> call, @NonNull Throwable t) {
+                showToast("Lỗi đường truyền");
+            }
+        });
+    }
+
+    private void getUsernameByDepartment(final String department) {
+
+        RetrofitContext.getUsernameByDepartment(department).enqueue(new Callback<ArrayList<String>>() {
+            @Override
+            public void onResponse(@NonNull Call<ArrayList<String>> call, @NonNull Response<ArrayList<String>> response) {
+                if (response.code() == 200) {
+                    usernameItems = response.body();
+                    filterSpinner(usernameSpinner, usernameItems, Constant.USERNAME);
+                } else {
+                    showToast("Lỗi đường truyền");
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ArrayList<String>> call, @NonNull Throwable t) {
+                showToast("Lỗi đường truyền");
             }
         });
     }
@@ -161,6 +190,10 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         editor.apply();
     }
 
+    private void showToast(String message){
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
     }
@@ -169,7 +202,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_login:
-                String username = usernameItems[usernameSpinner.getSelectedItemPosition()];
+                String username = usernameItems.get(usernameSpinner.getSelectedItemPosition());
                 String password = edtPassword.getText().toString();
                 login(username, password);
                 break;

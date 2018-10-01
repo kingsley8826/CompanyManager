@@ -24,4 +24,7 @@ public interface GetService {
 
     @GET("company/all")
     Call<ArrayList<Company>> getAllCompany();
+
+    @POST("company/detail")
+    Call<Company> getCompanyById(@Body RequestBody requestBody);
 }

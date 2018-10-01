@@ -1,47 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".activity.MotherActivity">
 
-    <!--<LinearLayout-->
-    <!--android:padding="@dimen/_10sdp"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:orientation="horizontal">-->
-
-    <!--<RelativeLayout-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_height="@dimen/_40sdp"-->
-    <!--android:layout_weight="1"-->
-    <!--android:background="@drawable/layout_grey">-->
-
-    <!--<Spinner-->
-    <!--android:id="@+id/spinner_period"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent" />-->
-    <!--</RelativeLayout>-->
-
-    <!--<RelativeLayout-->
-    <!--android:layout_marginStart="@dimen/_10sdp"-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_height="@dimen/_40sdp"-->
-    <!--android:layout_weight="1"-->
-    <!--android:background="@drawable/layout_grey">-->
-
-    <!--<Spinner-->
-    <!--android:id="@+id/spinner_year"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent" />-->
-    <!--</RelativeLayout>-->
-    <!--</LinearLayout>-->
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:background="@color/black">
 
         <EditText
@@ -61,7 +31,6 @@
         android:id="@+id/rvCompanies"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/edtCompany"
         android:layout_marginTop="@dimen/_10sdp">
 
     </android.support.v7.widget.RecyclerView>

@@ -2,6 +2,8 @@ package com.example.tuanfpt.companymanager.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
+
 public class Company {
     @SerializedName("_id")
     private String id;
@@ -19,8 +21,11 @@ public class Company {
     private String longitude;
     @SerializedName("lattitude")
     private String lattitude;
+    @SerializedName("maintenances")
+    private ArrayList<Maintain> maintenances;
 
-    public Company(String id, String name, String type, String mother, String address, String phone, String longitude, String lattitude) {
+    public Company(String id, String name, String type, String mother, String address, String phone,
+                   String longitude, String lattitude, ArrayList<Maintain> maintenances) {
         this.id = id;
         this.name = name;
         this.type = type;
@@ -29,6 +34,15 @@ public class Company {
         this.phone = phone;
         this.longitude = longitude;
         this.lattitude = lattitude;
+        this.maintenances = maintenances;
+    }
+
+    public ArrayList<Maintain> getMaintenances() {
+        return maintenances;
+    }
+
+    public void setMaintenances(ArrayList<Maintain> maintenances) {
+        this.maintenances = maintenances;
     }
 
     public String getId() {

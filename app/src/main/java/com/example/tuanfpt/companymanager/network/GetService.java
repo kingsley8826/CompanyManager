@@ -27,4 +27,7 @@ public interface GetService {
 
     @POST("company/detail")
     Call<Company> getCompanyById(@Body RequestBody requestBody);
+
+    @POST("company/maintain/add")
+    Call<Company> postMaintain(@Body RequestBody requestBody);
 }

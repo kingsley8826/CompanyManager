@@ -1,8 +1,11 @@
 package com.example.tuanfpt.companymanager.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -15,6 +18,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.tuanfpt.companymanager.Manifest;
 import com.example.tuanfpt.companymanager.R;
 import com.example.tuanfpt.companymanager.adapter.SpinnerAdapter;
 import com.example.tuanfpt.companymanager.models.Account;
@@ -46,6 +50,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     ArrayList<String> departmentItems = new ArrayList<>();
     ArrayList<String> usernameItems = new ArrayList<>();
 
+    private String[] listPermissions;
     private SharedPreferences sharedPreferences;
 
     @Override
@@ -57,10 +62,16 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        ensurePermission();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         String username = sharedPreferences.getString(Constant.USERNAME, "");
-        if(!username.equals("")){
+        if (!username.equals("")) {
             gotoHome();
         }
     }
@@ -69,7 +80,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         ButterKnife.bind(this);
         sharedPreferences = this.getSharedPreferences(Constant.COMPANY_KEY, MODE_PRIVATE);
         filterSpinner(departmentSpinner, departmentItems, Constant.DEPARTMENT);
-        filterSpinner(usernameSpinner, usernameItems,Constant.USERNAME);
+        filterSpinner(usernameSpinner, usernameItems, Constant.USERNAME);
         getAllDepartment();
     }
 
@@ -115,8 +126,8 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
             public void onResponse(@NonNull Call<ArrayList<Department>> call, @NonNull Response<ArrayList<Department>> response) {
                 if (response.code() == 200) {
                     ArrayList<Department> departments = response.body();
-                    if(departments == null) return;
-                    for(int i = 0 ; i < departments.size(); i++){
+                    if (departments == null) return;
+                    for (int i = 0; i < departments.size(); i++) {
                         departmentItems.add(departments.get(i).getName());
                     }
                     getUsernameByDepartment(departmentItems.get(0));
@@ -153,8 +164,8 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         });
     }
 
-    private void login(String username,String password){
-        RetrofitContext.callLoginApi(new Account(username,password)).enqueue(new Callback<Account>() {
+    private void login(String username, String password) {
+        RetrofitContext.callLoginApi(new Account(username, password)).enqueue(new Callback<Account>() {
             @Override
             public void onResponse(@NonNull Call<Account> call, @NonNull Response<Account> response) {
                 if (response.code() == 200) {
@@ -182,13 +193,42 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         finish();
     }
 
-    private void saveToPreference(String key, String text){
+    private void saveToPreference(String key, String text) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(key, text);
         editor.apply();
     }
 
-    private void showToast(String message){
+    private void ensurePermission() {
+        listPermissions = new String[]{android.Manifest.permission.CAMERA};
+        if (!hasPermissions(this, listPermissions)) {
+            ActivityCompat.requestPermissions(this, listPermissions, 404);
+        }
+    }
+
+    private boolean hasPermissions(Context context, String... permissions) {
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 404:
+                if (!hasPermissions(LoginActivity.this, listPermissions)) {
+                    finish();
+                }
+                break;
+        }
+    }
+
+    private void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 

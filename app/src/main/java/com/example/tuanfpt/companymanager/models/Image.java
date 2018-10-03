@@ -1,10 +1,11 @@
 package com.example.tuanfpt.companymanager.models;
 
+import android.net.Uri;
+
 public class Image {
     private String pathInDevice;
     private String url;
     private String type;
-
     public Image(String pathInDevice, String url, String type) {
         this.pathInDevice = pathInDevice;
         this.url = url;

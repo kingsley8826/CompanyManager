@@ -42,9 +42,9 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
             @Override
             public void onClick(View v) {
                 if (type.equals(Constant.BEFORE)) {
-                    listener.onItemBeforeSelected(position);
+                    listener.onItemBeforeSelected(images.get(position), position);
                 } else {
-                    listener.onItemAfterSelected(position);
+                    listener.onItemAfterSelected(images.get(position), position);
                 }
             }
         });
@@ -76,7 +76,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
                     Glide.with(itemView.getContext()).load(image.getUrl()).into(imageView);
                     break;
                 case Constant.DEVICE_PATH:
-                    setPicture(image.getPathInDevice());
+                    Glide.with(itemView.getContext()).load(image.getPathInDevice()).into(imageView);
                     break;
                 case Constant.ADD_BUTTON:
                     Glide.with(itemView.getContext()).load(R.drawable.capture).into(imageView);
@@ -84,30 +84,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
                 default:
                     break;
             }
-        }
-
-        private void setPicture(String photoPath) {
-            // Get the dimensions of the View
-            int targetW = imageView.getWidth();
-            int targetH = imageView.getHeight();
-
-            // Get the dimensions of the bitmap
-            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-            bmOptions.inJustDecodeBounds = true;
-            BitmapFactory.decodeFile(photoPath, bmOptions);
-            int photoW = bmOptions.outWidth;
-            int photoH = bmOptions.outHeight;
-
-            // Determine how much to scale down the image
-            int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
-
-            // Decode the image file into a Bitmap sized to fill the View
-            bmOptions.inJustDecodeBounds = false;
-            bmOptions.inSampleSize = scaleFactor;
-            bmOptions.inPurgeable = true;
-
-            Bitmap bitmap = BitmapFactory.decodeFile(photoPath, bmOptions);
-            imageView.setImageBitmap(bitmap);
         }
     }
 }

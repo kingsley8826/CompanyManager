@@ -1,19 +1,17 @@
 package com.example.tuanfpt.companymanager.models;
 
-public class ImageRequestCode {
+import android.net.Uri;
+
+public class ImageRequest {
     private int requestCode;
     private String type;
     private String photoPath;
 
-    public ImageRequestCode(int requestCode, String type, String photoPath) {
-        this.requestCode = requestCode;
-        this.type = type;
-        this.photoPath = photoPath;
-    }
-    public ImageRequestCode(int requestCode, String type) {
+    public ImageRequest(int requestCode, String type) {
         this.requestCode = requestCode;
         this.type = type;
     }
+
     public String getPhotoPath() {
         return photoPath;
     }

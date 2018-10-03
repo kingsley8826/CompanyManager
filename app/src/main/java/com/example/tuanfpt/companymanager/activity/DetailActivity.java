@@ -1,12 +1,18 @@
 package com.example.tuanfpt.companymanager.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -14,25 +20,26 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.example.tuanfpt.companymanager.R;
 import com.example.tuanfpt.companymanager.adapter.ImageAdapter;
 import com.example.tuanfpt.companymanager.adapter.OnImageItemSelected;
 import com.example.tuanfpt.companymanager.models.Company;
 import com.example.tuanfpt.companymanager.models.Image;
-import com.example.tuanfpt.companymanager.models.ImageRequestCode;
+import com.example.tuanfpt.companymanager.models.ImageRequest;
+import com.example.tuanfpt.companymanager.models.JSONAddMaintainSendForm;
 import com.example.tuanfpt.companymanager.models.Maintain;
+import com.example.tuanfpt.companymanager.models.PendingImage;
 import com.example.tuanfpt.companymanager.models.Period;
 import com.example.tuanfpt.companymanager.network.RetrofitContext;
 import com.example.tuanfpt.companymanager.utilities.Constant;
@@ -47,6 +54,7 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -88,52 +96,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     @BindView(R.id.spinner_year)
     Spinner spinnerYear;
 
-//    @BindView(R.id.btnAddBefore)
-//    Button btnAddBefore;
-//    @BindView(R.id.btnAddAfter)
-//    Button btnAddAfter;
-//
-//    @BindView(R.id.imv_before_1)
-//    ImageView imvBefore1;
-//    private final int TAKE_PICTURE_1 = 1;
-//    private String currentPhotoPath1;
-//
-//    @BindView(R.id.imv_before_2)
-//    ImageView imvBefore2;
-//    private final int TAKE_PICTURE_2 = 2;
-//    private String currentPhotoPath2;
-//
-//    @BindView(R.id.imv_before_3)
-//    ImageView imvBefore3;
-//    private final int TAKE_PICTURE_3 = 3;
-//    private String currentPhotoPath3;
-//
-//    @BindView(R.id.imv_before_4)
-//    ImageView imvBefore4;
-//    private final int TAKE_PICTURE_4 = 4;
-//    private String currentPhotoPath4;
-//
-//
-//    @BindView(R.id.imv_after_1)
-//    ImageView imvAfter1;
-//    private final int TAKE_PICTURE_5 = 5;
-//    private String currentPhotoPath5;
-//
-//    @BindView(R.id.imv_after_2)
-//    ImageView imvAfter2;
-//    private final int TAKE_PICTURE_6 = 6;
-//    private String currentPhotoPath6;
-//
-//    @BindView(R.id.imv_after_3)
-//    ImageView imvAfter3;
-//    private final int TAKE_PICTURE_7 = 7;
-//    private String currentPhotoPath7;
-//
-//    @BindView(R.id.imv_after_4)
-//    ImageView imvAfter4;
-//    private final int TAKE_PICTURE_8 = 8;
-//    private String currentPhotoPath8;
-
     @BindView(R.id.rvImageBefore)
     RecyclerView rvImageBefore;
     @BindView(R.id.rvImageAfter)
@@ -144,39 +106,45 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     @BindView(R.id.layoutExistData)
     LinearLayout layoutExistData;
 
+    @BindView(R.id.rgTrait)
+    RadioGroup rgTrait;
+    @BindView(R.id.rgProblem)
+    RadioGroup rgProblem;
+    @BindView(R.id.edtNote)
+    EditText edtNote;
+
     @BindView(R.id.layoutAddMaintainInfo)
     LinearLayout layoutAddMaintainInfo;
     @BindView(R.id.btnSave)
     Button btnSave;
+    @BindView(R.id.btnFab)
+    FloatingActionButton btnFab;
 
     private StorageReference mStorageRef;
-    private Uri imageUri;
-    UploadTask uploadTask;
 
     int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-    ArrayList<String> periodItems = new ArrayList<>();
-    ArrayList<String> yearItems = new ArrayList<>();
-    ArrayList<Image> imagesBefore = new ArrayList<>();
-    ArrayList<Image> imagesAfter = new ArrayList<>();
+    ArrayList<String> periodItems;
+    ArrayList<String> yearItems;
+    ArrayList<Image> imagesBefore;
+    ArrayList<Image> imagesAfter;
 
     private ImageAdapter imageBeforeAdapter;
     private ImageAdapter imageAfterAdapter;
 
+    private ArrayList<PendingImage> pendingImages;
+
     private String companyId;
     private Company company;
-    private ImageRequestCode currentImageRequestCode;
+    private ImageRequest currentImageRequest;
+    private ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+
         init();
         addListener();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
         if (companyId != null) {
             getCompanyById();
         }
@@ -184,13 +152,20 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     private void init() {
         ButterKnife.bind(this);
+
         mStorageRef = FirebaseStorage.getInstance().getReference();
         companyId = (String) getIntent().getSerializableExtra(Constant.COMPANY_ID);
 
+        dialog = new ProgressDialog(this);
+        dialog.setMessage("Đang xử lý...");
+        dialog.setCancelable(false);
+        resetData();
         // init spinner
+        periodItems = new ArrayList<>();
+        yearItems = new ArrayList<>();
         periodItems.add(Constant.KY_2);
         periodItems.add(Constant.KY_1);
-        for (int i = currentYear; i > currentYear - 20; i--) {
+        for (int i = currentYear; i > currentYear - 10; i--) {
             yearItems.add(String.valueOf(i));
         }
         filterSpinner(spinnerPeriod, periodItems);
@@ -199,10 +174,17 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         initRecycleView();
     }
 
+    private void resetData() {
+        imagesBefore = new ArrayList<>();
+        imagesAfter = new ArrayList<>();
+        pendingImages = new ArrayList<>();
+    }
+
     private void addListener() {
         spinnerPeriod.setOnItemSelectedListener(this);
         spinnerYear.setOnItemSelectedListener(this);
         btnSave.setOnClickListener(this);
+        btnFab.setOnClickListener(this);
     }
 
     private void initRecycleView() {
@@ -220,7 +202,9 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             imgBefore = new ArrayList<>();
             imgBefore.add(new Image("", "", Constant.ADD_BUTTON));
         }
-        imageBeforeAdapter.updateRecyclerView(imgBefore);
+        // chỉ nên truyền 1 object khác địa chỉ vào thì ms đồng bộ được data của recycleView với biến imagesBefore
+        ArrayList<Image> newImages = new ArrayList<>(imgBefore);
+        imageBeforeAdapter.updateRecyclerView(newImages);
     }
 
     private void resetRecycleViewAfter(ArrayList<Image> imgAfter) {
@@ -229,7 +213,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             imgAfter = new ArrayList<>();
             imgAfter.add(new Image("", "", Constant.ADD_BUTTON));
         }
-        imageAfterAdapter.updateRecyclerView(imgAfter);
+        ArrayList<Image> newImages = new ArrayList<>(imgAfter);
+        imageAfterAdapter.updateRecyclerView(newImages);
     }
 
     private void getCompanyById() {
@@ -356,8 +341,33 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
         switch (v.getId()) {
             case R.id.btnSave:
+                if (pendingImages == null || pendingImages.size() == 0 || !checkExistImage()) {
+                    showToast("Vui lòng chụp ảnh trước và sau khi bảo dưỡng");
+                    return;
+                }
+                if (!dialog.isShowing())
+                    dialog.show();
+                uploadFile();
+                break;
+            case R.id.btnFab:
+                showMap(company.getName() + ", " + company.getAddress());
                 break;
         }
+    }
+
+    private boolean checkExistImage() {
+        boolean beforeExist = false;
+        boolean afterExist = false;
+        for (PendingImage pendingImage : pendingImages) {
+            if (pendingImage.getState().equals(Constant.EXIST_STATE)) {
+                if (pendingImage.getType().equals(Constant.BEFORE)) {
+                    beforeExist = true;
+                } else {
+                    afterExist = true;
+                }
+            }
+        }
+        return beforeExist && afterExist;
     }
 
     // spinner click
@@ -373,20 +383,31 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     // image before click
     @Override
-    public void onItemBeforeSelected(int position) {
-        currentImageRequestCode = new ImageRequestCode(position, Constant.BEFORE);
-        takePhoto();
+    public void onItemBeforeSelected(Image image, int position) {
+        if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
+            if (image.getType().equals(Constant.ADD_BUTTON)) {
+                currentImageRequest = new ImageRequest(position, Constant.BEFORE);
+                takePhoto(Constant.BEFORE, position);
+            }
+        } else {
+            showToast(getString(R.string.no_camera));
+        }
     }
 
     // image after click
     @Override
-    public void onItemAfterSelected(int position) {
-        currentImageRequestCode = new ImageRequestCode(position, Constant.AFTER);
-        takePhoto();
+    public void onItemAfterSelected(Image image, int position) {
+        if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
+            if (image.getType().equals(Constant.ADD_BUTTON)) {
+                currentImageRequest = new ImageRequest(position, Constant.AFTER);
+                takePhoto(Constant.AFTER, position);
+            }
+        } else {
+            showToast(getString(R.string.no_camera));
+        }
     }
 
-
-    public void takePhoto() {
+    public void takePhoto(String type, int position) {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
 
@@ -394,7 +415,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             File photoFile = null;
             try {
                 photoFile = createImageFile();
-                currentImageRequestCode.setPhotoPath(photoFile.getAbsolutePath());
+                currentImageRequest.setPhotoPath(photoFile.getAbsolutePath());
             } catch (IOException ignored) {
             }
 
@@ -402,9 +423,11 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 Uri photoURI = FileProvider.getUriForFile(this,
                         "com.example.android.fileprovider",
                         photoFile);
-                imageUri = photoURI;
+
+                if (pendingImages == null) pendingImages = new ArrayList<>();
+                pendingImages.add(new PendingImage(photoURI, position, type, Constant.INIT_STATE));
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, currentImageRequestCode.getRequestCode());
+                startActivityForResult(takePictureIntent, currentImageRequest.getRequestCode());
             }
         }
     }
@@ -426,48 +449,55 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
-            if (currentImageRequestCode != null && requestCode == currentImageRequestCode.getRequestCode()) {
-                if (currentImageRequestCode.getType().equals(Constant.BEFORE)) {
-                    if (currentImageRequestCode.getRequestCode() >= 0 && currentImageRequestCode.getRequestCode() < imagesBefore.size()) {
-                        imagesBefore.get(currentImageRequestCode.getRequestCode()).setPathInDevice(currentImageRequestCode.getPhotoPath());
-                        imagesBefore.get(currentImageRequestCode.getRequestCode()).setType(Constant.DEVICE_PATH);
+            if (currentImageRequest != null && requestCode == currentImageRequest.getRequestCode()) {
+                if (currentImageRequest.getType().equals(Constant.BEFORE)) {
+                    Log.d("tuandm", imagesBefore.size() + "");
+                    if (currentImageRequest.getRequestCode() >= 0 && currentImageRequest.getRequestCode() < imagesBefore.size()) {
+                        imagesBefore.get(currentImageRequest.getRequestCode()).setPathInDevice(currentImageRequest.getPhotoPath());
+                        imagesBefore.get(currentImageRequest.getRequestCode()).setType(Constant.DEVICE_PATH);
                         imagesBefore.add(new Image("", "", Constant.ADD_BUTTON));
                         resetRecycleViewBefore(imagesBefore);
                     }
                 } else {
-                    if (currentImageRequestCode.getRequestCode() >= 0 && currentImageRequestCode.getRequestCode() < imagesAfter.size()) {
-                        imagesAfter.get(currentImageRequestCode.getRequestCode()).setPathInDevice(currentImageRequestCode.getPhotoPath());
-                        imagesAfter.get(currentImageRequestCode.getRequestCode()).setType(Constant.DEVICE_PATH);
+                    if (currentImageRequest.getRequestCode() >= 0 && currentImageRequest.getRequestCode() < imagesAfter.size()) {
+                        imagesAfter.get(currentImageRequest.getRequestCode()).setPathInDevice(currentImageRequest.getPhotoPath());
+                        imagesAfter.get(currentImageRequest.getRequestCode()).setType(Constant.DEVICE_PATH);
                         imagesAfter.add(new Image("", "", Constant.ADD_BUTTON));
                         resetRecycleViewAfter(imagesAfter);
                     }
                 }
+                if (pendingImages != null && pendingImages.size() > 0)
+                    pendingImages.get(pendingImages.size() - 1).setState(Constant.EXIST_STATE);
             }
         }
     }
 
     private void uploadFile() {
-        StorageReference riversRef = mStorageRef.child("imagetuandm/" + imageUri.getLastPathSegment());
-        uploadTask = riversRef.putFile(imageUri);
 
-// Register observers to listen for when the download is done or if it fails
-        uploadTask.addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                showToast("upload fail" + exception.getMessage());
+        for (final PendingImage pendingImage : pendingImages) {
+            if (pendingImage.getState().equals(Constant.EXIST_STATE)) {
+                StorageReference riversRef = mStorageRef.child(Constant.FIREBASE_FOLDER + pendingImage.getUri().getLastPathSegment());
+                UploadTask uploadTask = riversRef.putFile(pendingImage.getUri());
+
+                // Register observers to listen for when the download is done or if it fails
+                uploadTask.addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        pendingImage.setState(Constant.UPLOAD_FAIL);
+                    }
+                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        getUrl(pendingImage);
+                    }
+                });
             }
-        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                showToast("upload success");
-                getUrl();
-            }
-        });
+        }
     }
 
-    private void getUrl() {
-        final StorageReference ref = mStorageRef.child("imagetuandm/" + imageUri.getLastPathSegment());
-        uploadTask = ref.putFile(imageUri);
+    private void getUrl(final PendingImage pendingImage) {
+        final StorageReference ref = mStorageRef.child(Constant.FIREBASE_FOLDER + pendingImage.getUri().getLastPathSegment());
+        UploadTask uploadTask = ref.putFile(pendingImage.getUri());
 
         Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
             @Override
@@ -482,62 +512,97 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             public void onComplete(@NonNull Task<Uri> task) {
                 if (task.isSuccessful()) {
                     Uri downloadUri = task.getResult();
-                    Log.d("tuandm", "succc");
-                    Log.d("tuandm", downloadUri.toString());
+                    pendingImage.setUrl(downloadUri.toString());
+                    pendingImage.setState(Constant.UPLOAD_SUCCESS);
+                    if (checkUploadDoneAll()) {
+                        postMaintain();
+                    }
                 } else {
-                    Log.d("tuandm", "failll");
+                    pendingImage.setState(Constant.UPLOAD_FAIL);
                 }
             }
         });
+    }
+
+    private boolean checkUploadDoneAll() {
+        for (PendingImage pendingImage : pendingImages) {
+            if (pendingImage.getState().equals(Constant.EXIST_STATE)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void postMaintain() {
+
+        String companyId = company.getId();
+        String period = periodItems.get(spinnerPeriod.getSelectedItemPosition());
+        String year = yearItems.get(spinnerYear.getSelectedItemPosition());
+        String trait = ((RadioButton) findViewById(rgTrait.getCheckedRadioButtonId())).getText().toString();
+        String problem = ((RadioButton) findViewById(rgProblem.getCheckedRadioButtonId())).getText().toString();
+        String date = android.text.format.DateFormat.format("dd/MM/yyyy", new Date()).toString();
+        String employeeName = this.getSharedPreferences(Constant.COMPANY_KEY, MODE_PRIVATE).getString(Constant.USERNAME, "");
+        String note = edtNote.getText().toString();
+
+        ArrayList<String> imgBefore = new ArrayList<>();
+        ArrayList<String> imgAfter = new ArrayList<>();
+        for (PendingImage pendingImage : pendingImages) {
+            if (pendingImage.getState().equals(Constant.UPLOAD_SUCCESS)) {
+                if (pendingImage.getType().equals(Constant.BEFORE)) {
+                    imgBefore.add(pendingImage.getUrl());
+                } else {
+                    imgAfter.add(pendingImage.getUrl());
+                }
+            }
+        }
+
+        JSONAddMaintainSendForm jsonAddMaintainSendForm
+                = new JSONAddMaintainSendForm(companyId, period, imgBefore, imgAfter, trait, problem, year, date, employeeName, note);
+
+        RetrofitContext.postMaintain(jsonAddMaintainSendForm).enqueue(new Callback<Company>() {
+            @Override
+            public void onResponse(@NonNull Call<Company> call, @NonNull Response<Company> response) {
+                if (response.code() == 200) {
+                    if (dialog.isShowing())
+                        dialog.dismiss();
+                    showDialog("Lưu lại thành công");
+                    init();
+                    getCompanyById();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Company> call, @NonNull Throwable t) {
+                showDialog("Lưu lại thất bại");
+                resetData();
+            }
+        });
+    }
+
+    private void showMap(String address) {
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse("geo:0,0?q=" + address)); //lat lng or address query
+            if (intent.resolveActivity(getPackageManager()) != null) {
+                startActivity(intent);
+            }
+        } catch (ActivityNotFoundException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void showDialog(String message) {
+        new AlertDialog.Builder(this)
+                .setMessage(message)
+                .setCancelable(false)
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                }).show();
     }
 
     private void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }
-
-
-//    private void updateRecyclerViewBefore(ArrayList<Image> images) {
-//        imagesBefore = images;
-//        imageBeforeAdapter = new ImageAdapter(imagesBefore);
-//        rvImageBefore.setAdapter(imageBeforeAdapter);
-//    }
-//
-//    private void updateRecyclerViewAfter(ArrayList<Image> images) {
-//        imagesAfter = images;
-//        imageAfterAdapter = new ImageAdapter(imagesAfter);
-//        rvImageAfter.setAdapter(imageAfterAdapter);
-//    }
-//
-//    private void setPicture(ImageView imvPhoto) {
-//        // Get the dimensions of the View
-//        int targetW = imvPhoto.getWidth();
-//        int targetH = imvPhoto.getHeight();
-//
-//        // Get the dimensions of the bitmap
-//        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-//        bmOptions.inJustDecodeBounds = true;
-//        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-//        int photoW = bmOptions.outWidth;
-//        int photoH = bmOptions.outHeight;
-//
-//        // Determine how much to scale down the image
-//        int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
-//
-//        // Decode the image file into a Bitmap sized to fill the View
-//        bmOptions.inJustDecodeBounds = false;
-//        bmOptions.inSampleSize = scaleFactor;
-//        bmOptions.inPurgeable = true;
-//
-//        Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-//        imvPhoto.setImageBitmap(bitmap);
-//        uploadFile();
-//    }
-//
-//    private void goToCamera(int type){
-//
-//        Intent intent = new Intent(DetailActivity.this, TakeImageActivity.class);
-//        startActivityForResult(intent, type);
-//        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-//
-//    }

@@ -18,4 +18,11 @@ public class Constant {
     public static final String BEFORE = "before";
     public static final String AFTER = "after";
 
+    public static final String FIREBASE_FOLDER = "maintain_image/";
+
+    public static final String INIT_STATE = "init_state";
+    public static final String EXIST_STATE = "exist_state";
+    public static final String UPLOAD_FAIL = "upload_fail";
+    public static final String UPLOAD_SUCCESS = "upload_success";
+
 }

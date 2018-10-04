@@ -14,7 +14,7 @@
     <color name="grey_600">#757575</color>
     <color name="grey_500">#9E9E9E</color>
     <color name="red_500">#F44336</color>
-    <color name="orange_300">#FFB74D</color>
-    <color name="orange_100">#FFE0B2</color>
+    <color name="deepOrange_300">#FF8A65</color>
+    <color name="deepOrange_200">#FFAB91</color>
     <color name="colorBlue">#4285F4</color>
 </resources>

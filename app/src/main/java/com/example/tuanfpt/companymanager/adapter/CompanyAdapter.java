@@ -96,10 +96,10 @@ public class CompanyAdapter extends RecyclerView.Adapter<CompanyAdapter.CompanyV
         void bindData(Company company) {
             tvCompany.setText(company.getName());
             if (company.getType().equals(Constant.COMPANY_MOTHER)) {
-                itemCompany.setCardBackgroundColor(itemView.getResources().getColor(R.color.orange_300));
+                itemCompany.setCardBackgroundColor(itemView.getResources().getColor(R.color.deepOrange_300));
                 tvMotherCompany.setVisibility(View.GONE);
             } else {
-                itemCompany.setCardBackgroundColor(itemView.getResources().getColor(R.color.orange_100));
+                itemCompany.setCardBackgroundColor(itemView.getResources().getColor(R.color.deepOrange_200));
                 tvMotherCompany.setText(Html.fromHtml("<u>" + company.getMother() + "</u>"));
             }
             tvPhone.setText(company.getPhone());

@@ -350,7 +350,9 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 uploadFile();
                 break;
             case R.id.btnFab:
-                showMap(company.getName() + ", " + company.getAddress());
+                if(company != null){
+                    showMap(company.getName() + ", " + company.getAddress());
+                }
                 break;
         }
     }

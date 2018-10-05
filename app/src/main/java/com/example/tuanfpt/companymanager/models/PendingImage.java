@@ -9,7 +9,7 @@ public class PendingImage {
     private Uri uri;
     private int position;
     private String type;
-    private String state; // Constant: init, exits, uploadFail, upLoadSuccess
+    private String state; // Constant: init, exist, uploadFail, upLoadSuccess
 
     public PendingImage(Uri uri, int position, String type, String state) {
         this.uri = uri;

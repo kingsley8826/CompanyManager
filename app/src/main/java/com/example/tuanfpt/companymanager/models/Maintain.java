@@ -6,6 +6,10 @@ import java.util.ArrayList;
 
 public class Maintain {
 
+    @SerializedName("mother")
+    private String mother;
+    @SerializedName("child")
+    private String child;
     @SerializedName("period")
     private String period;
     @SerializedName("year")
@@ -25,6 +29,21 @@ public class Maintain {
     @SerializedName("imageAfter")
     private ArrayList<String> imageAfter;
 
+    public Maintain(String mother, String child, String period, String year, String date, String employeeName,
+                    String trait, String problem, String note, ArrayList<String> imageBefore, ArrayList<String> imageAfter) {
+        this.mother = mother;
+        this.child = child;
+        this.period = period;
+        this.year = year;
+        this.date = date;
+        this.employeeName = employeeName;
+        this.trait = trait;
+        this.problem = problem;
+        this.note = note;
+        this.imageBefore = imageBefore;
+        this.imageAfter = imageAfter;
+    }
+
     public Maintain(String period, String year, String date, String employeeName, String trait,
                     String problem, String note, ArrayList<String> imageBefore, ArrayList<String> imageAfter) {
         this.period = period;
@@ -36,6 +55,22 @@ public class Maintain {
         this.note = note;
         this.imageBefore = imageBefore;
         this.imageAfter = imageAfter;
+    }
+
+    public String getMother() {
+        return mother;
+    }
+
+    public void setMother(String mother) {
+        this.mother = mother;
+    }
+
+    public String getChild() {
+        return child;
+    }
+
+    public void setChild(String child) {
+        this.child = child;
     }
 
     public String getPeriod() {

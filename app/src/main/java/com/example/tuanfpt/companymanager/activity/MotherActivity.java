@@ -1,6 +1,6 @@
 package com.example.tuanfpt.companymanager.activity;
 
-import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -9,8 +9,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.inputmethod.InputMethodManager;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.tuanfpt.companymanager.R;
@@ -34,6 +35,8 @@ public class MotherActivity extends AppCompatActivity implements OnCompanyItemSe
     EditText edtCompany;
     @BindView(R.id.rvCompanies)
     RecyclerView rvCompanies;
+    @BindView(R.id.layoutAnalysis)
+    LinearLayout layoutAnalysis;
 
     private CompanyAdapter companyAdapter;
     protected boolean isChildrenActivity = false;
@@ -60,6 +63,12 @@ public class MotherActivity extends AppCompatActivity implements OnCompanyItemSe
     }
 
     private void addListener() {
+        layoutAnalysis.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MotherActivity.this, AnalysisActivity.class));
+            }
+        });
         edtCompany.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

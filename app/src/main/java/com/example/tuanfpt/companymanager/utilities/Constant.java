@@ -10,6 +10,7 @@ public class Constant {
 
     public static final String KY_1 = "Kỳ 1";
     public static final String KY_2 = "Kỳ 2";
+    public static final String ALL = "All";
 
     public static final String DEVICE_PATH = "device_path";
     public static final String ADD_BUTTON = "add_button";
@@ -24,5 +25,7 @@ public class Constant {
     public static final String EXIST_STATE = "exist_state";
     public static final String UPLOAD_FAIL = "upload_fail";
     public static final String UPLOAD_SUCCESS = "upload_success";
+
+    public static final String TIME_ZONE = "Asia/Ho_Chi_Minh";
 
 }

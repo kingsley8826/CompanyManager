@@ -43,6 +43,7 @@ import com.example.tuanfpt.companymanager.models.PendingImage;
 import com.example.tuanfpt.companymanager.models.Period;
 import com.example.tuanfpt.companymanager.network.RetrofitContext;
 import com.example.tuanfpt.companymanager.utilities.Constant;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -51,6 +52,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.stfalcon.frescoimageviewer.ImageViewer;
 
 import java.io.File;
 import java.io.IOException;
@@ -350,7 +352,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 uploadFile();
                 break;
             case R.id.btnFab:
-                if(company != null){
+                if (company != null) {
                     showMap(company.getName() + ", " + company.getAddress());
                 }
                 break;
@@ -387,10 +389,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onItemBeforeSelected(Image image, int position) {
         if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
-            if (image.getType().equals(Constant.ADD_BUTTON)) {
-                currentImageRequest = new ImageRequest(position, Constant.BEFORE);
-                takePhoto(Constant.BEFORE, position);
-            }
+            currentImageRequest = new ImageRequest(position, Constant.BEFORE);
+            takePhoto(Constant.BEFORE, position);
         } else {
             showToast(getString(R.string.no_camera));
         }
@@ -400,14 +400,26 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onItemAfterSelected(Image image, int position) {
         if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
-            if (image.getType().equals(Constant.ADD_BUTTON)) {
-                currentImageRequest = new ImageRequest(position, Constant.AFTER);
-                takePhoto(Constant.AFTER, position);
-            }
+            currentImageRequest = new ImageRequest(position, Constant.AFTER);
+            takePhoto(Constant.AFTER, position);
         } else {
             showToast(getString(R.string.no_camera));
         }
     }
+
+    @Override
+    public void onViewImage(int position, ArrayList<String> images) {
+
+//        SimpleDraweeView draweeView = (SimpleDraweeView) findViewById(R.id.my_image_view);
+//        Uri imageUri= Uri.fromFile(new File(imagePath));// For files on device
+//        draweeView.setImageURI(imageUri);
+//
+        //noinspection unchecked
+        new ImageViewer.Builder(this, images)
+                .setStartPosition(position)
+                .show();
+    }
+
 
     public void takePhoto(String type, int position) {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);

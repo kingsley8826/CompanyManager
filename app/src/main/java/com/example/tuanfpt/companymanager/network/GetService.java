@@ -3,6 +3,7 @@ package com.example.tuanfpt.companymanager.network;
 import com.example.tuanfpt.companymanager.models.Account;
 import com.example.tuanfpt.companymanager.models.Company;
 import com.example.tuanfpt.companymanager.models.Department;
+import com.example.tuanfpt.companymanager.models.Maintain;
 
 import java.util.ArrayList;
 
@@ -30,4 +31,7 @@ public interface GetService {
 
     @POST("company/maintain/add")
     Call<Company> postMaintain(@Body RequestBody requestBody);
+
+    @GET("company/maintain/all")
+    Call<ArrayList<Maintain>> getAllMaintain();
 }

@@ -6,6 +6,7 @@ import com.example.tuanfpt.companymanager.models.CompanySendForm;
 import com.example.tuanfpt.companymanager.models.Department;
 import com.example.tuanfpt.companymanager.models.JSONAddMaintainSendForm;
 import com.example.tuanfpt.companymanager.models.JSONDepartmentSendForm;
+import com.example.tuanfpt.companymanager.models.Maintain;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -57,5 +58,9 @@ public class RetrofitContext {
                 MediaType.parse("application/json"),
                 new Gson().toJson(jsonAddMaintainSendForm));
         return RETROFIT.create(GetService.class).postMaintain(requestBody);
+    }
+
+    public static Call<ArrayList<Maintain>> getAllMaintain() {
+        return RETROFIT.create(GetService.class).getAllMaintain();
     }
 }

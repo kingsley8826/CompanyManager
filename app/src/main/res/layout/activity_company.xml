@@ -14,38 +14,39 @@
         android:focusable="true"
         android:focusableInTouchMode="true">
 
-        <!--<LinearLayout-->
-            <!--android:id="@+id/layoutAnalysis"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:layout_alignParentEnd="true"-->
-            <!--android:layout_margin="@dimen/_5sdp"-->
-            <!--android:orientation="vertical">-->
+        <LinearLayout
+            android:id="@+id/layoutAnalysis"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="@dimen/_5sdp"
+            android:orientation="vertical">
 
-            <!--<ImageView-->
-                <!--android:layout_width="@dimen/_30sdp"-->
-                <!--android:layout_height="0dp"-->
-                <!--android:layout_gravity="center_horizontal|bottom"-->
-                <!--android:layout_weight="1"-->
-                <!--android:background="@drawable/analysis"/>-->
+            <ImageView
+                android:layout_width="@dimen/_30sdp"
+                android:layout_height="0dp"
+                android:layout_gravity="center_horizontal|bottom"
+                android:layout_weight="1"
+                android:background="@drawable/analysis"/>
 
-            <!--<TextView-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="0dp"-->
-                <!--android:layout_weight="1"-->
-                <!--android:gravity="top"-->
-                <!--android:text="@string/analysis"-->
-                <!--android:textColor="@color/white"-->
-                <!--android:textSize="@dimen/_10sdp"-->
-                <!--android:textStyle="bold" />-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="top"
+                android:text="@string/analysis"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10sdp"
+                android:textStyle="bold" />
 
-        <!--</LinearLayout>-->
+        </LinearLayout>
 
         <EditText
             android:id="@+id/edtCompany"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="@dimen/_5sdp"
+            android:layout_toStartOf="@id/layoutAnalysis"
             android:background="@drawable/layout_border_white"
             android:drawableEnd="@drawable/ic_search"
             android:hint="@string/search_hint"

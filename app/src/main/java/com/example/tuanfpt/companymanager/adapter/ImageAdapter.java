@@ -2,8 +2,10 @@ package com.example.tuanfpt.companymanager.adapter;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +16,7 @@ import com.example.tuanfpt.companymanager.R;
 import com.example.tuanfpt.companymanager.models.Image;
 import com.example.tuanfpt.companymanager.utilities.Constant;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHolder> {
@@ -41,11 +44,24 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (type.equals(Constant.BEFORE)) {
-                    listener.onItemBeforeSelected(images.get(position), position);
+                if (images.get(position).getType().equals(Constant.ADD_BUTTON)) {
+                    if (type.equals(Constant.BEFORE)) {
+                        listener.onItemBeforeSelected(images.get(position), position);
+                    } else {
+                        listener.onItemAfterSelected(images.get(position), position);
+                    }
                 } else {
-                    listener.onItemAfterSelected(images.get(position), position);
+                    ArrayList<String> slideImages = new ArrayList<>();
+                    for (Image image : images) {
+                        if (image.getType().equals(Constant.DEVICE_PATH)) {
+                            slideImages.add("file://" + image.getPathInDevice());
+                        } else if (image.getType().equals(Constant.URL_PATH)) {
+                            slideImages.add(image.getUrl());
+                        }
+                    }
+                    listener.onViewImage(position, slideImages);
                 }
+
             }
         });
     }
